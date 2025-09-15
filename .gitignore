@@ -1,0 +1,15 @@
+# ROS 2 build system
+build/
+install/
+log/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# VSCode settings
+.vscode/
+
+# ROS 2 launch logs
+*.launch.py~
