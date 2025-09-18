@@ -12,16 +12,16 @@
     <!-- crop rows -->
     <model name="crop_row_1">
       <static>true</static>
-      <pose>0 0.5 0.025 0 0 0</pose>
+      <pose>0 0.9 0.025 0 0 0</pose>
       <link name="row_link_1">
         <collision name="collision">
-          <geometry><box><size>20 1.2 0.05</size></box></geometry>
+          <geometry><box><size>20 0.5 1.05</size></box></geometry>
         </collision>
         <visual name="visual">
-          <geometry><box><size>20 0.5 0.05</size></box></geometry>
+          <geometry><box><size>20 0.5 1.05</size></box></geometry>
           <material>
-            <ambient>0 0.8 0 1</ambient>
-            <diffuse>0 0.8 0 1</diffuse>
+            <ambient>0 0.9 0 1</ambient>
+            <diffuse>0 0.9 0 1</diffuse>
             <emissive>0 0.6 0 1</emissive>
           </material>
         </visual>
@@ -30,16 +30,16 @@
 
     <model name="crop_row_2">
       <static>true</static>
-      <pose>0 -0.5 0.025 0 0 0</pose>
+      <pose>0 -0.9 0.025 0 0 0</pose>
       <link name="row_link_2">
         <collision name="collision">
-          <geometry><box><size>20 1.2 0.05</size></box></geometry>
+          <geometry><box><size>20 0.5 1.05</size></box></geometry>
         </collision>
         <visual name="visual">
-          <geometry><box><size>20 0.5 0.05</size></box></geometry>
+          <geometry><box><size>20 0.5 1.05</size></box></geometry>
           <material>
-            <ambient>0 0.8 0 1</ambient>
-            <diffuse>0 0.8 0 1</diffuse>
+            <ambient>0 0.9 0 1</ambient>
+            <diffuse>0 0.9 0 1</diffuse>
             <emissive>0 0.6 0 1</emissive>
           </material>
         </visual>
@@ -74,7 +74,8 @@
 
       <!-- camera -->
       <link name="camera_link">
-        <pose>0.20 0 0.40 0 0.9 0</pose>
+        <!-- pitch = 0.60 rad as requested -->
+        <pose>0.20 0 0.32 0 0.60 0</pose>
         <inertial>
           <mass>0.2</mass>
           <inertia>
@@ -83,13 +84,22 @@
             <izz>0.0005</izz>
           </inertia>
         </inertial>
+
         <sensor name="camera" type="camera">
           <always_on>true</always_on>
           <update_rate>30</update_rate>
           <camera>
+            <!-- ~60 deg HFOV -->
             <horizontal_fov>1.047</horizontal_fov>
-            <image><width>640</width><height>480</height><format>R8G8B8</format></image>
-            <clip><near>0.05</near><far>50</far></clip>
+            <image>
+              <width>640</width>
+              <height>480</height>
+              <format>R8G8B8</format>
+            </image>
+            <clip>
+              <near>0.05</near>
+              <far>50</far>
+            </clip>
           </camera>
           <plugin name="gazebo_ros_camera" filename="libgazebo_ros_camera.so">
             <ros_namespace>/</ros_namespace>
@@ -100,6 +110,94 @@
             <update_rate>30</update_rate>
           </plugin>
         </sensor>
+
+        <!-- === Camera frustum visualization (visual-only, no collision) === -->
+        <!-- Parameters derived from HFOV=1.047 rad, 4:3 aspect; near=0.05 m; far viz=2.0 m -->
+
+        <!-- Near frame -->
+        <visual name="frustum_near">
+          <pose>0.05 0 0 0 0 0</pose> <!-- x = near -->
+          <geometry>
+            <!-- thickness, width=2*wN≈0.0577, height=2*hN≈0.0433 -->
+            <box><size>0.002 0.0577 0.0433</size></box>
+          </geometry>
+          <material>
+            <ambient>0 1 1 1</ambient>
+            <diffuse>0 1 1 1</diffuse>
+            <emissive>0 0.7 0.7 1</emissive>
+          </material>
+          <transparency>0.3</transparency>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+
+        <!-- Far frame (visualization at 2.0 m) -->
+        <visual name="frustum_far">
+          <pose>2.0 0 0 0 0 0</pose>
+          <geometry>
+            <!-- thickness, width=2*wF≈2.309, height=2*hF≈1.732 -->
+            <box><size>0.002 2.309 1.732</size></box>
+          </geometry>
+          <material>
+            <ambient>0 1 1 1</ambient>
+            <diffuse>0 1 1 1</diffuse>
+            <emissive>0 0.7 0.7 1</emissive>
+          </material>
+          <transparency>0.6</transparency>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+
+        <!-- Center axis (optional) -->
+        <visual name="frustum_axis">
+          <!-- place behind camera: x = -0.3 m -->
+          <pose>-0.3 0 0 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.005</radius>
+              <length>0.3</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0 1 1 1</ambient>
+            <diffuse>0 1 1 1</diffuse>
+          </material>
+          <transparency>0.3</transparency>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+
+        <!-- Four corner rays (approx length L≈2.468), oriented to far-plane corners -->
+        <!-- Top-Left corner vector: (2.0, +1.1547, +0.8660) -->
+        <visual name="frustum_ray_TL">
+          <pose>1.0 0.577 0.433 0 -0.359 0.524</pose>
+          <geometry><box><size>2.468 0.01 0.01</size></box></geometry>
+          <material><ambient>0 1 1 1</ambient><diffuse>0 1 1 1</diffuse></material>
+          <transparency>0.2</transparency><cast_shadows>false</cast_shadows>
+        </visual>
+
+        <!-- Top-Right: (2.0, -1.1547, +0.8660) -->
+        <visual name="frustum_ray_TR">
+          <pose>1.0 -0.577 0.433 0 -0.359 -0.524</pose>
+          <geometry><box><size>2.468 0.01 0.01</size></box></geometry>
+          <material><ambient>0 1 1 1</ambient><diffuse>0 1 1 1</diffuse></material>
+          <transparency>0.2</transparency><cast_shadows>false</cast_shadows>
+        </visual>
+
+        <!-- Bottom-Left: (2.0, +1.1547, -0.8660) -->
+        <visual name="frustum_ray_BL">
+          <pose>1.0 0.577 -0.433 0 0.359 0.524</pose>
+          <geometry><box><size>2.468 0.01 0.01</size></box></geometry>
+          <material><ambient>0 1 1 1</ambient><diffuse>0 1 1 1</diffuse></material>
+          <transparency>0.2</transparency><cast_shadows>false</cast_shadows>
+        </visual>
+
+        <!-- Bottom-Right: (2.0, -1.1547, -0.8660) -->
+        <visual name="frustum_ray_BR">
+          <pose>1.0 -0.577 -0.433 0 0.359 -0.524</pose>
+          <geometry><box><size>2.468 0.01 0.01</size></box></geometry>
+          <material><ambient>0 1 1 1</ambient><diffuse>0 1 1 1</diffuse></material>
+          <transparency>0.2</transparency><cast_shadows>false</cast_shadows>
+        </visual>
+        <!-- === /Camera frustum visualization === -->
+
       </link>
 
       <!-- fixed joint: base -> camera -->
@@ -119,4 +217,3 @@
     </model>
   </world>
 </sdf>
-

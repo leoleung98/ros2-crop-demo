@@ -13,6 +13,7 @@ setup(
         ('share/' + package_name + '/launch', ['launch/row_follow_launch.py']),
         ('share/' + package_name + '/world', ['world/crops.world']),
         ('share/' + package_name, ['LICENSE']),
+        ('share/row_follower/meshes', ['meshes/camera_frustum.stl']),
     ],
     install_requires=['setuptools'],
     zip_safe=True,
