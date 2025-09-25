@@ -11,9 +11,10 @@ setup(
          ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
         ('share/' + package_name + '/launch', ['launch/row_follow_launch.py']),
-        ('share/' + package_name + '/world', ['world/crops.world']),
+        ('share/' + package_name + '/world',  ['world/crops.world']),
+        ('share/' + package_name + '/config', ['config/perception.yaml',
+                                               'config/controller.yaml']),
         ('share/' + package_name, ['LICENSE']),
-        ('share/row_follower/meshes', ['meshes/camera_frustum.stl']),
     ],
     install_requires=['setuptools'],
     zip_safe=True,
@@ -29,4 +30,3 @@ setup(
         ],
     },
 )
-

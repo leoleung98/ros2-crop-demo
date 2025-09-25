@@ -1,0 +1,10 @@
+row_controller:
+  ros__parameters:
+    k_yaw: 1.2
+    k_lat: 0.02
+    v_forward: 0.50
+    v_min: 0.05
+    omega_limit: 1.50
+    omega_acc_limit: 2.00
+    sym_deadband: 0.01
+    confidence_gain: 1.0

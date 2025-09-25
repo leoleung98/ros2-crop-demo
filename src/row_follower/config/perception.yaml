@@ -1,0 +1,29 @@
+perception:
+  ros__parameters:
+    lane_width_m: 1.0
+    follow_mode: center
+    left_offset_m: 0.20
+    num_bands: 24
+
+    # default non-ROI band (used only if roi_enable=false)
+    y_low_frac: 0.0
+    y_high_frac: 0.95
+
+    # adaptive ROI ("software gimbal")
+    roi_enable: true
+    roi_ground_min: 0.15
+    roi_lane_area_min: 0.15
+
+    # Use two parallel arrays instead of nested list
+    roi_band_lows:  [0.0, 0.0, 0.30, 0.50]
+    roi_band_highs: [0.70, 0.95, 0.95, 0.95]
+
+    roi_switch_delta: 0.05
+    roi_hold_frames: 5
+
+    # edge tracking / constraints
+    edge_max_step_px: 40.0
+    edge_alpha: 0.35
+    min_lane_width_px: 120.0
+    max_lane_width_px: 1200.0
+    search_radius_px: 120.0

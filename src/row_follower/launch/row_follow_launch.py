@@ -8,24 +8,28 @@ def generate_launch_description():
     pkg = get_package_share_directory('row_follower')
     world = os.path.join(pkg, 'world', 'crops.world')
 
+    percy_yaml = os.path.join(pkg, 'config', 'perception.yaml')
+    ctrl_yaml  = os.path.join(pkg, 'config', 'controller.yaml')
+
     gz = ExecuteProcess(
         cmd=['gazebo', world, '--verbose'],
         output='screen'
     )
 
-    perception = Node(
+    percy = Node(
         package='row_follower',
         executable='perception',
         name='perception',
-        output='screen'
+        output='screen',
+        parameters=[percy_yaml] if os.path.isfile(percy_yaml) else []
     )
 
-    controller = Node(
+    ctrl = Node(
         package='row_follower',
         executable='controller',
-        name='controller',
-        output='screen'
+        name='row_controller',
+        output='screen',
+        parameters=[ctrl_yaml] if os.path.isfile(ctrl_yaml) else []
     )
 
-    return LaunchDescription([gz, perception, controller])
-
+    return LaunchDescription([gz, percy, ctrl])
